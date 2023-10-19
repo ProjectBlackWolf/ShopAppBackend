@@ -1,0 +1,34 @@
+services:
+  - name: backend
+    env:
+      NODE_ENV: production
+      PORT: 30662
+      DATABASE_URL: postgres://xGLIRfO3klBdDikf:o7eM79Q5YKcrN2oS@storeapp-yug3v-postgresql.external.kinsta.app:30662/storeapp
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthcheck
+    github:
+      branch: main
+      deployOnPush: true
+    envVars:
+      - name: USER
+        value: xGLIRfO3klBdDikf
+      - name: HOST
+        value: storeapp-yug3v-postgresql.storeapp-yug3v.svc.cluster.local
+      - name: PASSWORD
+        value: o7eM79Q5YKcrN2oS
+      - name: DATABASE
+        value: "storeapp"
+      - name: CONNECTION_STRING
+        value: postgres://xGLIRfO3klBdDikf:o7eM79Q5YKcrN2oS@storeapp-yug3v-postgresql.storeapp-yug3v.svc.cluster.local:5432/storeapp
+      - name: NODE_ENV
+        value: production
+      - name: PORT
+        value: "5432"
+    postgres:
+      version: "14"
+      diskSizeGB: 1
+      env:
+        POSTGRES_USER: xGLIRfO3klBdDikf
+        POSTGRES_PASSWORD: o7eM79Q5YKcrN2oS
+        POSTGRES_DB: storeapp
