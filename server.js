@@ -96,7 +96,6 @@ app.put("/invItem/:id", async (req, res) => {
                 item: results.rows[0]
             }
         });
-        res.json("Updated Item.");
     } catch (err) {
         console.log(err);
     }
@@ -210,7 +209,8 @@ app.post("/invItem", async (req, res) => {
             description, image, category_id, sku) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
             [
                 req.body.id, req.body.name, req.body.price, req.body.quantity,
-                req.body.description, req.body.image, req.body.category_id, req.body.sku
+                req.body.description, req.body.image,
+                req.body.category_id, req.body.sku
             ]
         );
         console.log(results);
@@ -234,6 +234,16 @@ app.get('/', (req, res) => {
 // orders: with the values productId,
 // and make the routes get, post, update and delete
 
+app.get("/users", async (req, res) => {
+    try {
+        const users = await db.query('SELECT * FROM users;');
+        console.log(users);
+        res.json(users.rows);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 // getting the right user
 app.get('/users/:id', async (req, res) => {
     try {
@@ -242,7 +252,7 @@ app.get('/users/:id', async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-})
+});
 
 // grabbing one users stuff.
 app.get('/orders/stuff/:userid', async (req, res) => {
