@@ -4,12 +4,11 @@ import methodOverride from 'method-override';
 import db from './db/index.js';
 import dotenv from 'dotenv';
 import { getDirName } from "./getDirName.js";
-import morgan from 'morgan';
-import validInfo  from "./validInfo.js";
+import validInfo from "./validInfo.js";
 import bcrypt from 'bcrypt';
 // import jwtAuth from './JwtAuth.js'; these are unused - don't import them here.
 // import jwtSeed from './JwtSeed.js'; 
-const port = process.env.PORT || 3005;
+const port = 3000;
 const app = express();
 const dirName = getDirName(import.meta.url);
 /*
@@ -78,43 +77,29 @@ app.delete('/cart/:id', async (req, res) => {
     }
 })
 
-// 'add to cart'
+// 'add to cart'??????
 app.put("/cart/:id", async (req, res) => {
-    try {
-        const results = await db.query("UPDATE cart SET name = $1, price = $2, description = $3, image = $4, quantity = $5 where id = $6 returning *", [
-            req.params.id
-        ]);
-        res.status(200).json({
-            status: "success",
-            data: {
-                users: results.rows[0]
-            }
-        });
-    } catch (error) {
-        console.log(error);
-    }
+
 })
 
 // update
 // yes just because of this assignment
-app.put("/invItem/:id", async (req, res) => {
+// but im using patch instead
+app.patch("/invItem/:id", async (req, res) => {
     try {
-        const results = await db.query(
-            "UPDATE product SET name = $1, price = $2, description = $3, image = $4, quantity = $5, category_id = $6, sku = $7 where id = $8 returning *",
-            [req.body.name, req.body.price, req.body.description, req.params.image, req.params.quantity, req.params.category_id, req.params.sku, req.params.id]
-        );
-        res.status(200).json({
+        const results = db.query(`UPDATE product SET name = $1, price = $2, description = $3, image = $4, quantity = $5, category_id = $6, sku = $7 where id = $8 returning *;`,
+            [req.body.id, req.body.name, req.body.price, req.body.description, req.body.image, req.body.quantity, req.body.category_id, req.body.sku]);
+        console.log(results);
+        res.status(201).json({
             status: "success",
             data: {
-                item: results.rows[0]
-            }
+                item: results.rows[0],
+            },
         });
-        res.json("Updated Item.");
-    } catch (err) {
-        console.log(err);
+        console.log(res);
+    } catch(e) {
+        console.log(e);
     }
-    console.log(req.params.id);
-    console.log(req.body);
 });
 
 // create a users
@@ -122,7 +107,7 @@ app.post("/users", async (req, res) => {
     // getting userdata from table
     // 
     try {
-        const send = await db.query(`INSERT INTO users(id, us, ps, cartInv) values ($1, $2, $3, $4) returning *`,
+        const send = await db.query(`INSERT INTO users(id, us, ps, cartInv) values ($1, $2, $3, $4) returning *;`,
             [
                 req.body.id, req.body.us, req.body.ps, req.body.cartInv
             ]
@@ -140,37 +125,13 @@ app.post("/users", async (req, res) => {
 })
 
 app.post("/signup", validInfo, async (req, res) => {
-    const { us, ps, cartInv } = req.body;
 
-    try {
-        const user = await db.query("SELECT * FROM users WHERE us = $1", [
-            us
-        ]);
-        
-        if (user.rows.length > 0) {
-            return res.status(401).json("User already exists!");
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const bcryptPassword = await bcrypt.hash(ps, salt);
-
-        let newUser = await db.query(
-            "INSERT INTER users (us, ps, cart) VALUES ($1, $2, $3) RETURNING *",
-            [us, bcryptPassword, cartInv]
-        );
-
-        const jwtToken = jwtGenerator(newUser.rows[0].us);
-        return res.json({ jwtToken });
-    } catch (error) {
-        console.log(err.message);
-        res.status(500).send("Server error");
-    }
 });
 
 // create 
 app.post("/invItem", async (req, res) => {
     try {
-        const results = await db.query(`INSERT INTO product(id, name, price, description, image, quantity, category_id, sku) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *`,
+        const results = await db.query(`INSERT INTO product(id, name, price, description, image, quantity, category_id, sku) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
             [
                 req.body.id, req.body.name, req.body.price, req.body.description, req.body.image,
                 req.body.quantity, req.body.category_id, req.body.sku

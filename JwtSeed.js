@@ -70,4 +70,4 @@ function seed() {
     console.log("Flyweights: " + userTokenFactoy.getCount());
 }
 
-export default {userBase};
+export default {userBase, seed};
