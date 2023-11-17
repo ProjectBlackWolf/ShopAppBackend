@@ -85,17 +85,20 @@ app.put("/cart/:id", async (req, res) => {
 // update
 // yes just because of this assignment
 // but im using patch instead
-app.patch("/invItem/:id", async (req, res) => {
+app.put("/invItem/:id", async (req, res) => {
+        const { id } = req.params;
+        const { name, price, description, image, quantity, category_id, sku } = req.body;
     try {
-        const results = db.query(`UPDATE product SET name = $1, price = $2, description = $3, image = $4, quantity = $5, category_id = $6, sku = $7 where id = $8 returning *;`,
-            [req.body.id, req.body.name, req.body.price, req.body.description, req.body.image, req.body.quantity, req.body.category_id, req.body.sku]);
+        // the result data needs to be in the same order as the one in the braces.
+        // that was probably the only issue.
+        const results = await db.query('UPDATE product SET name = $1, price = $2, description = $3, image = $4, quantity = $5, category_id = $6, sku = $7 WHERE id = $8',
+            [
+                name, price,
+                description, image,
+                quantity, category_id, sku, id
+            ]);
         console.log(results);
-        res.status(201).json({
-            status: "success",
-            data: {
-                item: results.rows[0],
-            },
-        });
+        res.json(results);
         console.log(res);
     } catch(e) {
         console.log(e);
@@ -131,7 +134,9 @@ app.post("/signup", validInfo, async (req, res) => {
 // create 
 app.post("/invItem", async (req, res) => {
     try {
-        const results = await db.query(`INSERT INTO product(id, name, price, description, image, quantity, category_id, sku) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
+        const results = await db.query(`INSERT INTO product(id, name, price,
+            description, image, quantity, category_id, sku)
+            values ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
             [
                 req.body.id, req.body.name, req.body.price, req.body.description, req.body.image,
                 req.body.quantity, req.body.category_id, req.body.sku

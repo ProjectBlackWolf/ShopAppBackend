@@ -9,7 +9,7 @@ const pool = new Pool({
                 password: process.env.PASSWORD,
                 database: process.env.DATABASE,
                 port: process.env.PORT
-        });
+});
 pool.connect();
 console.log('did we connex');
 export default pool
