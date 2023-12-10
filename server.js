@@ -77,36 +77,58 @@ app.delete('/cart/:id', async (req, res) => {
     }
 })
 
-// 'add to cart'??????
+// 'add to cart'?????? // this could also 
 app.put("/cart/:id", async (req, res) => {
-
+    const { id } = req.params; // user id
+    // find the order ids under user id
+    const { us, ps, cartInv } = req.body;
+    try {
+        const results = await db.query(`UPDATE users SET us = $1, ps = $2, cartInv = $3 WHERE id = $4`,
+            [us, ps, cartInv, id]);
+        console.log(results);
+        console.log('====================================');
+        res.json(results);
+        console.log('====================================');
+        console.log(res);
+        console.log('====================================');
+    } catch (error) {
+        console.log(error);
+    }
+    // then it is the model of listing items 
+    // out of sql
 })
 
 // update
 // yes just because of this assignment
 // but im using patch instead
+// done
 app.put("/invItem/:id", async (req, res) => {
         const { id } = req.params;
         const { name, price, description, image, quantity, category_id, sku } = req.body;
-    try {
-        // the result data needs to be in the same order as the one in the braces.
-        // that was probably the only issue.
-        const results = await db.query('UPDATE product SET name = $1, price = $2, description = $3, image = $4, quantity = $5, category_id = $6, sku = $7 WHERE id = $8',
-            [
-                name, price,
-                description, image,
-                quantity, category_id, sku, id
-            ]);
-        console.log(results);
-        res.json(results);
-        console.log(res);
-    } catch(e) {
-        console.log(e);
-    }
+            try {
+                // the result data needs to be in the same order as the one in the braces.
+                // that was probably the only issue.
+                const results = await db.query('UPDATE product SET name = $1, price = $2, description = $3, image = $4, quantity = $5, category_id = $6, sku = $7 WHERE id = $8',
+                    [
+                        name, price,
+                        description, image,
+                        quantity, category_id,
+                        sku, id
+                    ]);
+                console.log(results);
+                console.log('====================================');
+                res.json(results);
+                console.log('====================================');
+                console.log(res);
+                console.log('====================================');
+            } catch(e) {
+                console.log(e);
+            }
 });
 
 // create a users
-app.post("/users", async (req, res) => {
+
+app.post("/signup", validInfo, async (req, res) => {
     // getting userdata from table
     // 
     try {
@@ -119,16 +141,12 @@ app.post("/users", async (req, res) => {
         res.status(201).json({
             status: "success",
             data: {
-                item: results.rows[0],
+                user: results.rows[0],
             },
         });
     } catch (error) {
         console.log(error);
     }
-})
-
-app.post("/signup", validInfo, async (req, res) => {
-
 });
 
 // create 
@@ -138,8 +156,10 @@ app.post("/invItem", async (req, res) => {
             description, image, quantity, category_id, sku)
             values ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
             [
-                req.body.id, req.body.name, req.body.price, req.body.description, req.body.image,
-                req.body.quantity, req.body.category_id, req.body.sku
+                req.body.id, req.body.name, req.body.price,
+                req.body.description, req.body.image,
+                req.body.quantity, req.body.category_id,
+                req.body.sku
             ]
         );
         console.log(results);
@@ -162,8 +182,34 @@ app.get('/', (req, res) => {
 app.get('/users', async (req, res) => {
     try {
         const userbase = await db.query('SELECT * FROM users');
+        console.log('====================================');
+        console.log(userbase);
+        console.log('====================================');
+        res.json(userbase.rows);
     } catch (error) {
-        
+        console.log(error);
+    }
+});
+
+app.get("/users/:id", async (req, res) => {
+    console.log(req.body);
+    try {
+        const results =
+            await db.query(`SELECT * FROM users where id = $1`,
+                [req.params.id]);
+        console.log('====================================');
+        console.log(results);
+        console.log('====================================');
+        res.status(200).json({
+            status: "success",
+            data: {
+                user: results.rows[0]
+            }
+        });
+    } catch (error) {
+        console.log('====================================');
+        console.log(error);
+        console.log('====================================');
     }
 })
 
