@@ -1,5 +1,6 @@
 import pkg from 'pg';
 import dotenv from 'dotenv';
+// import jwtGenerator from '../jwtGenerator';
 
 const { Pool } = pkg;
 dotenv.config();
